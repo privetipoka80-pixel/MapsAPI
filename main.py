@@ -3,16 +3,17 @@ import sys
 
 import requests
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel
+from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton
 from PyQt6.QtCore import Qt
-
-SCREEN_SIZE = [600, 450]
+from themes import dark_style, light_style
+SCREEN_SIZE = [800, 450]
 
 
 class Example(QWidget):
     def __init__(self):
         super().__init__()
         self.scale = [0.002, 0.002]
+        self.theme_api = "light"
         self.getImage()
         self.initUI()
 
@@ -22,7 +23,7 @@ class Example(QWidget):
         self.scale_resp = ','.join(map(str, self.scale))
         ll_spn = f'll=37.530887,55.703118&spn={(self.scale_resp)}'
 
-        map_request = f"{server_address}{ll_spn}&apikey={api_key}"
+        map_request = f"{server_address}{ll_spn}&apikey={api_key}&theme={self.theme_api}"
         response = requests.get(map_request)
 
         if not response:
@@ -45,6 +46,12 @@ class Example(QWidget):
         self.image.move(0, 0)
         self.image.resize(600, 450)
         self.image.setPixmap(self.pixmap)
+
+        self.theme_button = QPushButton(self)
+        self.theme_button.setText('Темная тема')
+        self.theme_button.resize(140, 40)
+        self.theme_button.move(650, 0)
+        self.theme_button.clicked.connect(self.theme)
 
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
@@ -70,6 +77,21 @@ class Example(QWidget):
     def newImage(self):
         self.pixmap = QPixmap(self.map_file)
         self.image.setPixmap(self.pixmap)
+
+    def theme(self):
+        theme = self.sender().text()
+        if theme == 'Светлая тема':
+            self.theme_api = 'light'
+            self.getImage()
+            self.newImage()
+            self.theme_button.setText('Тёмная тема')
+            self.setStyleSheet(light_style)
+        else:
+            self.theme_api = 'dark'
+            self.getImage()
+            self.newImage()
+            self.theme_button.setText('Светлая тема')
+            self.setStyleSheet(dark_style)
 
 
 if __name__ == '__main__':

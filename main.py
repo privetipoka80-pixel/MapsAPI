@@ -4,6 +4,7 @@ import sys
 import requests
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel
+from PyQt6.QtCore import Qt
 
 SCREEN_SIZE = [600, 450]
 
@@ -11,13 +12,15 @@ SCREEN_SIZE = [600, 450]
 class Example(QWidget):
     def __init__(self):
         super().__init__()
+        self.scale = [0.002, 0.002]
         self.getImage()
         self.initUI()
 
     def getImage(self):
         server_address = 'https://static-maps.yandex.ru/v1?'
         api_key = 'f3a0fe3a-b07e-4840-a1da-06f18b2ddf13'
-        ll_spn = 'll=37.530887,55.703118&spn=0.002,0.002'
+        self.scale_resp = ','.join(map(str, self.scale))
+        ll_spn = f'll=37.530887,55.703118&spn={(self.scale_resp)}'
 
         map_request = f"{server_address}{ll_spn}&apikey={api_key}"
         response = requests.get(map_request)
@@ -46,6 +49,27 @@ class Example(QWidget):
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
         os.remove(self.map_file)
+
+    def keyPressEvent(self, event):
+        sc = 2
+        if event.key() == Qt.Key.Key_PageUp:
+
+            self.scale[0] *= sc
+            self.scale[1] *= sc
+            if self.scale[0] < 90:
+                self.getImage()
+                self.newImage()
+
+        elif event.key() == Qt.Key.Key_PageDown:
+            self.scale[0] /= sc
+            self.scale[1] /= sc
+            if 0 < self.scale[0]:
+                self.getImage()
+                self.newImage()
+
+    def newImage(self):
+        self.pixmap = QPixmap(self.map_file)
+        self.image.setPixmap(self.pixmap)
 
 
 if __name__ == '__main__':

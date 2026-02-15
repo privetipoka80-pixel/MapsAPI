@@ -16,7 +16,7 @@ class Example(QWidget):
         self.x = 37.530887
         self.y = 55.703118
         self.scale = [0.002, 0.002]
-        self.theme_api = "light"
+        self.theme_api = "dark"
         self.getImage()
         self.initUI()
 
@@ -54,11 +54,10 @@ class Example(QWidget):
         self.image.setPixmap(self.pixmap)
 
         self.theme_button = QPushButton(self)
-        self.theme_button.setText('Темная тема')
+        self.theme_button.setText('Светлая тема')
         self.theme_button.resize(140, 40)
         self.theme_button.move(650, 0)
         self.theme_button.clicked.connect(self.theme)
-        self.theme_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
